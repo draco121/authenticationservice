@@ -77,9 +77,6 @@ func (s authenticationService) PasswordLogin(ctx context.Context, loginInput *mo
 func (s authenticationService) Authenticate(ctx context.Context, token string) (*models.JwtCustomClaims, error) {
 	claims, err := jwt.VerifyJwtToken(token)
 	if err != nil {
-		if claims != nil {
-			return &claims.JwtCustomClaims, err
-		}
 		return nil, err
 	} else {
 		_, err := s.repo.FindOneById(ctx, claims.JwtCustomClaims.SessionId)
