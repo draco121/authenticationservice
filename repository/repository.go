@@ -53,7 +53,7 @@ func (ur authenticationRepository) UpdateOne(ctx context.Context, session *model
 	}}
 	result := models.Session{}
 	err := ur.db.Collection("sessions").FindOneAndUpdate(ctx, filter, update).Decode(&result)
-	if err == mongo.ErrNoDocuments {
+	if errors.Is(err, mongo.ErrNoDocuments) {
 		return nil, err
 	} else {
 		return &result, nil
@@ -68,7 +68,7 @@ func (ur authenticationRepository) FindOneById(ctx context.Context, id string) (
 		filter := bson.D{{Key: "_id", Value: objectId}}
 		result := models.Session{}
 		err := ur.db.Collection("sessions").FindOne(ctx, filter).Decode(&result)
-		if err == mongo.ErrNoDocuments {
+		if errors.Is(err, mongo.ErrNoDocuments) {
 			return nil, err
 		} else {
 			return &result, nil
