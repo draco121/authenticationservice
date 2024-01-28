@@ -23,9 +23,15 @@ func RunApp() {
 	controllers := controllers.NewControllers(service)
 	router := gin.Default()
 	routes.RegisterRoutes(controllers, router)
-	router.Run()
+	err := router.Run()
+	if err != nil {
+		return
+	}
 }
 func main() {
-	godotenv.Load()
+	err := godotenv.Load()
+	if err != nil {
+		return
+	}
 	RunApp()
 }
