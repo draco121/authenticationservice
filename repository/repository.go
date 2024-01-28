@@ -2,6 +2,8 @@ package repository
 
 import (
 	"context"
+	"errors"
+	"github.com/draco121/common/clients"
 	"time"
 
 	"github.com/draco121/common/models"
@@ -16,15 +18,21 @@ type IAuthenticationRepository interface {
 	UpdateOne(ctx context.Context, session *models.Session) (*models.Session, error)
 	FindOneById(ctx context.Context, id string) (*models.Session, error)
 	DeleteOneById(ctx context.Context, id string) (*models.Session, error)
+	GetUserByEmail(userId string) (*models.User, error)
+	GetUserById(userId string) (*models.User, error)
 }
 
 type authenticationRepository struct {
 	IAuthenticationRepository
-	db *mongo.Database
+	db                   *mongo.Database
+	userServiceApiClient clients.IUserServiceApiClient
 }
 
-func NewAuthenticationRepository(database *mongo.Database) IAuthenticationRepository {
-	repo := authenticationRepository{db: database}
+func NewAuthenticationRepository(database *mongo.Database, userServiceApiClient clients.IUserServiceApiClient) IAuthenticationRepository {
+	repo := authenticationRepository{
+		db:                   database,
+		userServiceApiClient: userServiceApiClient,
+	}
 	return &repo
 }
 
@@ -76,10 +84,18 @@ func (ur authenticationRepository) DeleteOneById(ctx context.Context, id string)
 		filter := bson.D{{Key: "_id", Value: objectId}}
 		result := models.Session{}
 		err := ur.db.Collection("users").FindOneAndDelete(ctx, filter).Decode(&result)
-		if err == mongo.ErrNoDocuments {
+		if errors.Is(err, mongo.ErrNoDocuments) {
 			return nil, err
 		} else {
 			return &result, nil
 		}
 	}
+}
+
+func (ur authenticationRepository) GetUserById(userId string) (*models.User, error) {
+	return ur.userServiceApiClient.GetUserById(userId)
+}
+
+func (ur authenticationRepository) GetUserByEmail(email string) (*models.User, error) {
+	return ur.userServiceApiClient.GetUserById(email)
 }

@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/draco121/authenticationservice/repository"
-	"github.com/draco121/common/clients"
 	"github.com/draco121/common/jwt"
 	"github.com/draco121/common/models"
 	"github.com/draco121/common/utils"
@@ -22,20 +21,18 @@ type IAuthenticationService interface {
 
 type authenticationService struct {
 	IAuthenticationService
-	repo                 repository.IAuthenticationRepository
-	userServiceApiClient clients.IUserServiceApiClient
+	repo repository.IAuthenticationRepository
 }
 
-func NewAuthenticationService(repository repository.IAuthenticationRepository, userServiceApiClient clients.IUserServiceApiClient) IAuthenticationService {
+func NewAuthenticationService(repository repository.IAuthenticationRepository) IAuthenticationService {
 	us := authenticationService{
-		repo:                 repository,
-		userServiceApiClient: userServiceApiClient,
+		repo: repository,
 	}
 	return us
 }
 
 func (s authenticationService) PasswordLogin(ctx context.Context, loginInput *models.LoginInput) (*models.LoginOutput, error) {
-	user, err := s.userServiceApiClient.GetUserByEmail(loginInput.Email)
+	user, err := s.repo.GetUserByEmail(loginInput.Email)
 	if err != nil {
 		return nil, err
 	} else {
@@ -106,7 +103,7 @@ func (s authenticationService) RefreshLogin(ctx context.Context, refreshToken st
 			if err != nil {
 				return nil, err
 			} else {
-				user, err := s.userServiceApiClient.GetUserById(session.UserId)
+				user, err := s.repo.GetUserById(session.UserId)
 				if err != nil {
 					return nil, err
 				} else {

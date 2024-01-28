@@ -17,9 +17,9 @@ import (
 
 func RunApp() {
 	db := database.NewMongoDatabaseDefaults()
-	repo := repository.NewAuthenticationRepository(db)
 	userServiceApiClient := clients.NewUserServiceApiClient(os.Getenv("USER_SERVICE_BASEURL"))
-	service := core.NewAuthenticationService(repo, userServiceApiClient)
+	repo := repository.NewAuthenticationRepository(db, userServiceApiClient)
+	service := core.NewAuthenticationService(repo)
 	controllers := controllers.NewControllers(service)
 	router := gin.Default()
 	routes.RegisterRoutes(controllers, router)
