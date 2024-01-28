@@ -97,5 +97,5 @@ func (ur authenticationRepository) GetUserById(userId string) (*models.User, err
 }
 
 func (ur authenticationRepository) GetUserByEmail(email string) (*models.User, error) {
-	return ur.userServiceApiClient.GetUserById(email)
+	return ur.userServiceApiClient.GetUserByEmail(email)
 }
