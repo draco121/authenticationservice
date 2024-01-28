@@ -29,9 +29,6 @@ func RunApp() {
 	}
 }
 func main() {
-	err := godotenv.Load()
-	if err != nil {
-		return
-	}
+	_ = godotenv.Load()
 	RunApp()
 }
