@@ -16,7 +16,7 @@ import (
 )
 
 func RunApp() {
-	db := database.NewMongoDatabaseDefaults()
+	db := database.NewMongoDatabase(os.Getenv("MONGODB_URI"), os.Getenv("MONGODB_DBNAME"))
 	userServiceApiClient := clients.NewUserServiceApiClient(os.Getenv("USER_SERVICE_BASEURL"))
 	repo := repository.NewAuthenticationRepository(db, userServiceApiClient)
 	service := core.NewAuthenticationService(repo)
