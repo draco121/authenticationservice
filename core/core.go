@@ -90,6 +90,9 @@ func (s authenticationService) Authenticate(ctx context.Context, token string) (
 func (s authenticationService) RefreshLogin(ctx context.Context, refreshToken string) (*models.LoginOutput, error) {
 	claims, err := jwt.VerfiyRefreshToken(refreshToken)
 	if err != nil {
+		if claims != nil {
+			_, err = s.repo.DeleteOneById(ctx, claims.SessionId)
+		}
 		return nil, err
 	} else {
 		session, err := s.repo.FindOneById(ctx, claims.SessionId)
@@ -128,6 +131,9 @@ func (s authenticationService) RefreshLogin(ctx context.Context, refreshToken st
 func (s authenticationService) Logout(ctx context.Context, token string) error {
 	claims, err := jwt.VerifyJwtToken(token)
 	if err != nil {
+		if claims != nil {
+			_, err = s.repo.DeleteOneById(ctx, claims.JwtCustomClaims.SessionId)
+		}
 		return err
 	} else {
 		_, err := s.repo.DeleteOneById(ctx, claims.JwtCustomClaims.SessionId)
